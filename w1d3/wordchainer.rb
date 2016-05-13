@@ -10,8 +10,8 @@ class WordChainer
     @current_words = {}
   end
 
-  def adjacent_words(source)
-    @dictionary.find_all {|word| one_letter_off?(source, word)}
+  def adjacent_words(given_word)
+    @dictionary.find_all {|dict_word| one_letter_off?(given_word, dict_word)}
   end
 
   def one_letter_off?(word1, word2)
@@ -24,18 +24,15 @@ class WordChainer
   end
 
   def run(source, target)
-    start_time = Time.now
     @current_words = [source]
     @all_seen_words = {source => nil}
-    until @current_words.empty?
-      @current_words = explore_current_words(target)
-      break if @current_words == :stop
+    until @current_words.empty? || @all_seen_words.key?(target)
+      @current_words = explore_current_words
     end
     puts build_path(target) || "The chain cannot be made!"
-    puts "time took: #{(Time.now - start_time).to_s}"
-  end
+    end
 
-  def explore_current_words(target)
+  def explore_current_words
     new_current_words = []
 
     @current_words.each do |current_word|
@@ -44,7 +41,6 @@ class WordChainer
         unless @all_seen_words.key?(adjacent_word)
           new_current_words << adjacent_word
           @all_seen_words[adjacent_word] = current_word
-          return :stop if adjacent_word == target
         end
 
       end
